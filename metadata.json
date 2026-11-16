@@ -1,0 +1,8 @@
+{
+  "name": "ESP32 MiniCast",
+  "description": "Interactive robotic eye and wireless 128x64 OLED display controller for ESP32-WROOM-32 with full Android Studio Jetpack Compose project and ESP32 BluetoothSerial firmware.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

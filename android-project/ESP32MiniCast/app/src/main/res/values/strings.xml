@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ESP32 MiniCast</string>
+    <string name="bt_permission_rationale">MiniCast uses Bluetooth Classic to pair and send commands to your ESP32 OLED display.</string>
+</resources>

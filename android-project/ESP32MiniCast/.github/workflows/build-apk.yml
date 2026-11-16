@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -19,13 +22,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Accept Android SDK licenses & install API 35
         run: |
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
           yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -36,8 +37,23 @@ jobs:
         working-directory: android-project/ESP32MiniCast
         run: gradle testDebugUnitTest assembleDebug --no-daemon
 
+      - name: Copy APK with clean release filename
+        run: cp android-project/ESP32MiniCast/app/build/outputs/apk/debug/app-debug.apk ESP32-MiniCast-v1.2.0-debug.apk
+
       - name: Upload app-debug.apk artifact
         uses: actions/upload-artifact@v4
         with:
           name: ESP32-MiniCast-Debug-APK
-          path: android-project/ESP32MiniCast/app/build/outputs/apk/debug/app-debug.apk
+          path: ESP32-MiniCast-v1.2.0-debug.apk
+
+      - name: Publish APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.2.0
+          name: ESP32 MiniCast v1.2.0
+          body: |
+            Automated Android Debug APK build for **ESP32 MiniCast** (Bluetooth Classic SPP + 128x64 OLED controller).
+            - Package: `com.minicast.app`
+            - Target Hardware: Original ESP32-WROOM-32 + SSD1306 128x64 I2C (GPIO 21/22)
+          files: ESP32-MiniCast-v1.2.0-debug.apk
+          make_latest: true
